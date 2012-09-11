@@ -16,12 +16,16 @@ import java.util.concurrent.TimeUnit;
 
 public class HttpServer {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
-		String root = "/Users/martinbuergi/Documents/dev/ws/html";
 		int port = 8080;
 		int bufferSize = 2*1024;
 
-		if (args.length > 0)
-			root = args[0];
+		if (args.length == 0){
+            System.err.println("Please specify document root directory");
+            System.exit(1);
+          }
+			
+		String root = args[0];
+		
 		if (args.length >= 2)
 			port = Integer.valueOf(args[1]);
 		if (args.length >= 3)
@@ -51,17 +55,18 @@ public class HttpServer {
 			System.out.println("buffersize is " + bufferSize);
 			
 			server.accept("Client connection",
-					new CompletionHandler<AsynchronousSocketChannel, Object>() {
-						public void completed(AsynchronousSocketChannel ch, Object att) {
-								System.out.println("Accepted a connection");
-								server.accept(null, this);
-								new Worker(ch).handle();							
-						}
+				new CompletionHandler<AsynchronousSocketChannel, Object>() {
+					public void completed(AsynchronousSocketChannel ch, Object att) {
+							System.out.println("Accepted a connection");
+							server.accept(null, this);
+							new Worker(ch).handle();							
+					}
 
-						public void failed(Throwable exc, Object att) {
-							System.out.println("Failed to accept connection");
-						}
-					});
+					public void failed(Throwable exc, Object att) {
+						System.err.println("Failed to accept connection");
+					}
+				}
+			);
 
 			group.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
