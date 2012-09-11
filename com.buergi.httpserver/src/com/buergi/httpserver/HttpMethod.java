@@ -4,14 +4,16 @@ public enum HttpMethod {
 	GET, POST, HEAD;
 	
 	
-	public static HttpMethod get(String s) throws HttpException {
-		if (s.equalsIgnoreCase("GET"))
+	public static HttpMethod get(String s) {
+		s = s.toUpperCase();
+		
+		if (s.equals("GET"))
 			return HttpMethod.GET;
-		else if (s.equalsIgnoreCase("POST"))
+		else if (s.equals("POST"))
 			return HttpMethod.POST;
-		else if (s.equalsIgnoreCase("HEAD"))
+		else if (s.equals("HEAD"))
 			return HttpMethod.HEAD;
 		
-		throw new HttpException(HttpStatusCode.NOT_IMPLEMENTED);
+		return null;
 	}
 }

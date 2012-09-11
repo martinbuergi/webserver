@@ -11,13 +11,13 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class HttpServer {
-	public static void main(String[] args) throws UnknownHostException,
-			IOException, InterruptedException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		String root = "/Users/martinbuergi/Documents/dev/ws/html";
-		int port = 80;
+		int port = 8080;
 		int bufferSize = 2*1024;
 
 		if (args.length > 0)
@@ -43,38 +43,19 @@ public class HttpServer {
 
 	public void start() {
 		try {
-			AsynchronousChannelGroup group = AsynchronousChannelGroup
-					.withThreadPool(Executors.newFixedThreadPool(50));
-
-			final AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel
-					.open(group).bind(new InetSocketAddress(port));
+			AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(50));
+			final AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group).bind(new InetSocketAddress(port));
 
 			System.out.println("Server listening on " + port);
 			System.out.println("root directory is " + root);
 			System.out.println("buffersize is " + bufferSize);
-
-
 			
 			server.accept("Client connection",
 					new CompletionHandler<AsynchronousSocketChannel, Object>() {
 						public void completed(AsynchronousSocketChannel ch, Object att) {
-							try {
-								System.out
-										.println("Accepted a connection from "
-												+ ch.getRemoteAddress()
-														.toString());
-								server.accept(null	, this);
-								new Worker(ch).handle();
-							} catch (IOException e) {
-								System.err.println("I/O error: "
-										+ e.getMessage());
-							} catch (InterruptedException e) {
-								System.err.println("Interrupted: "
-										+ e.getMessage());
-							} catch (ExecutionException e) {
-								System.err.println("Excecution error: "
-										+ e.getMessage());
-							}
+								System.out.println("Accepted a connection");
+								server.accept(null, this);
+								new Worker(ch).handle();							
 						}
 
 						public void failed(Throwable exc, Object att) {
@@ -98,48 +79,67 @@ public class HttpServer {
 			this.ch = ch;
 		};
 
-		public void handle() throws InterruptedException, ExecutionException,
-				IOException {
-			HttpRequest request = null;
-			HttpResponse response = null;
-			request = HttpRequest.Builder.build(ch, root, bufferSize);
-			response = HttpResponse.Builder.create(request).build();
+		public void handle()  {
+			try{
+				HttpRequest request = new HttpRequest(readChannel());
+				HttpResponse response = new HttpResponse(request, root);
 
-			// Write header
-			ch.write(ByteBuffer.wrap(response.getHeader().getBytes())).get();
-			
-			// Method HEAD does not require message
-			if (request.getHTTPMethod().equals(HttpMethod.HEAD)) {
+				// Write header
+				ch.write(ByteBuffer.wrap(response.getHeader().getBytes())).get();
+				
+				// Write message
+				writeMessage(response);
+	
 				ch.close();
+			} catch (IOException e) {
+				System.err.println("I/O error: " + e.getMessage());
+			} catch (InterruptedException e) {
+				System.err.println("Interrupted: " + e.getMessage());
+			} catch (ExecutionException e) {
+				System.err.println("Excecution error: " + e.getMessage());
+			}
+		}
+
+		private String readChannel() throws InterruptedException, ExecutionException{
+			ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
+			
+			StringBuffer sb = new StringBuffer();
+			
+			int x;
+			while ((x = ch.read(readBuffer).get()) != -1) {
+				readBuffer.flip();
+				sb.append(new String(readBuffer.array()));
+
+				if (x < bufferSize)
+					break;
+			}
+			
+			return sb.toString();
+		}
+
+		
+		private void writeMessage(HttpResponse httpResponse) throws InterruptedException, ExecutionException, IOException {
+			// error message?
+			if (httpResponse.getErrorMessage() != null) {
+				ch.write(ByteBuffer.wrap(httpResponse.getErrorMessage().getBytes()));
 				return;
 			}
 
-			writeMessage(response);
-
-			ch.close();
-		}
-
-		private void writeMessage(HttpResponse response) throws InterruptedException, ExecutionException, IOException {
-			AsynchronousFileChannel fCh = response.getFileChannel();
+			AsynchronousFileChannel fCh = httpResponse.getFileChannel();
+			
 			if (fCh == null)
 				return;
 
+			
 			ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
-//			readBuffer.rewind();
 			int pos = 0;
-//			int length = 0;
+
 			while (fCh.read(readBuffer, pos).get() >= 0) {
 				readBuffer.flip();
-//				readBuffer.rewind();
-//
-//				if (length < bufferSize){
-//					readBuffer = ByteBuffer.wrap(Arrays.copyOfRange(readBuffer.array(), 0, length));
-//					readBuffer.rewind();
-//				}
-//
-				ch.write(readBuffer).get();
+				Future<Integer> future = ch.write(readBuffer);
+				while (!future.isDone()){};
 				readBuffer.clear();
-//				readBuffer.rewind();
+
 				pos = pos + bufferSize;
 			}
 			

@@ -2,117 +2,73 @@ package com.buergi.httpserver;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class HttpRequest {
-	private HttpMethod httpMethod;
-	private HttpVersion httpVersion;
+	private String[] initialLines;
 	private String path;
-	private String absolutePath;
 	public Map<String, String> parameterMap;
 	
-	private HttpRequest(){
+	public HttpRequest(String requestHeader){
+		String lines[] = requestHeader.toString().split("\\r?\\n");
+		initialLines = lines[0].split(" ", 3);
+		path = initialLines[1];
+
+		Map<String, String> parameterMap = new HashMap<String, String>();
+
+		// get request parameters
+		addParameterToMap(Arrays.copyOfRange(lines, 1, lines.length), ":", parameterMap);
+
+		// get parameters in URL
+		int index = path.indexOf("?");
+		if (index > -1){
+			String[] params = path.substring(index+1).split("&");
+			addParameterToMap(params, "=", parameterMap);
+			path = path.substring(0,index);
+		}
+		
+		try {
+			path = URLDecoder.decode(path, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			System.err.println("Unsupported Encoding error: " + e.getMessage());
+		}
 	};
 	
-	public HttpMethod getHTTPMethod(){
-		return httpMethod;
+	public String getHTTPMethod() {
+		return initialLines[0];
 	}
 	
-	public HttpVersion getHTTPVersion(){
-		return httpVersion;
+	public String getHTTPVersion() {
+		return initialLines[2];
 	}
-	
-	public String getPath(){
+		
+	public String getPath() {
 		return path;
 	}
 	
-	public String getAbsolutePath() {
-		return absolutePath;
-	}
-
-	public static class Builder{
-		private Builder(){};
-		
-		public static HttpRequest build(AsynchronousSocketChannel ch, String root, int bufferSize){
-			HttpRequest request = new HttpRequest();
+	public Map<String, String> getParameterMap() {
+		return parameterMap;
+	}	
+	
+	private void addParameterToMap(String[] parameters, String delimiter, Map<String, String> parameterMap) {
+		for (String parameter : parameters){
+			parameter = parameter.trim();
+			if (parameter.length() == 0)
+				continue;
 			
-			ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
-			
-			StringBuffer sb = new StringBuffer();
-			
-			try {
-				int x;
-				while ((x = ch.read(readBuffer).get()) != -1) {
-					readBuffer.flip();
-					sb.append(new String(readBuffer.array()));
-
-					if (x < bufferSize)
-						break;
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-							
-			String lines[] = sb.toString().split("\\r?\\n");
-			String[] initialLine = lines[0].split(" ", 3);
-			try {
-				request.httpMethod = HttpMethod.get(initialLine[0]);
-				request.httpVersion = HttpVersion.get(initialLine[2]);
-			} catch (HttpException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			Map<String, String> parameterMap = new HashMap<String, String>();
-
-			request.path = initialLine[1];
-			int index = request.path.indexOf("?");
-			if (index > -1){
-				String[] params = request.path.substring(index+1).split("&");
-				for (String parameter : params)
-					addParameterToMap(parameter, "=", parameterMap);
-				
-					request.path = request.path.substring(0,index);
-			}
-			
-			try {
-				request.path = URLDecoder.decode(request.path, "UTF-8");
-				request.absolutePath = root.concat(request.path);
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-
-			for (int x = 1; x < lines.length; x++){
-				String line = lines[x].trim();
-				if (line.length() == 0)
-					continue;
-				
-				addParameterToMap(line, ":", parameterMap);
-			}
-			request.parameterMap = parameterMap;
-
-			return request;
-		}
-
-		private static void addParameterToMap(String parameter, String delimiter, Map<String, String> parameterMap) {
 			int c = parameter.indexOf(delimiter);
-			String key = parameter.substring(0, c);
-			String value = parameter.substring(c+1).trim();
+			
+			String key = c == -1 ? parameter : parameter.substring(0, c);
+			String value = c == -1 ? "" : parameter.substring(c+1).trim();
 			
 			try {
 				key = URLDecoder.decode(key, "UTF-8");
 				value = URLDecoder.decode(value, "UTF-8");
 			} catch (UnsupportedEncodingException e) {}
 			
-			parameterMap.put(key, value);					
+			parameterMap.put(key, value);
 		}
 	}
 }

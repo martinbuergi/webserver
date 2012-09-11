@@ -16,122 +16,134 @@ import org.apache.tika.Tika;
 public class HttpResponse {
 	private HttpVersion httpVersion;
 	private HttpStatusCode httpStatusCode;
-	private String contentType;
 	private AsynchronousFileChannel fileChannel;
-	private long contentLength = 0;
 	private Map<String, String> parameterMap;
-	
-	private String path;
+	private String errorMessage;
+	private long contentLength;
 	
 
-	private HttpResponse(){};
+	public HttpResponse(HttpRequest request, String docRoot) {
+		parameterMap = new HashMap<String, String>();
+		httpStatusCode = HttpStatusCode.OK;
+		errorMessage = null;
+		contentLength = 0;
+		
+		// check httpVersion
+		httpVersion = HttpVersion.get(request.getHTTPVersion());
+		if (httpVersion == null) {
+			httpVersion = HttpVersion.HTTP10;
+			httpStatusCode = HttpStatusCode.BAD_REQUEST;
+			return;
+		}
+		
+		// check httpMethod
+		HttpMethod httpMethod = HttpMethod.get(request.getHTTPMethod());
+		if (httpMethod == null) {
+			httpStatusCode = HttpStatusCode.NOT_IMPLEMENTED;
+			return;
+		}
+
+		// get message
+		Path path = evaluatePath(docRoot, request.getPath());	
+		if (path == null){
+			if ("45".contains(httpStatusCode.toString().substring(0, 1))){
+				errorMessage = String.format("<html><header>Server error:</header>%s<body></body></html>", httpStatusCode);
+				contentLength = errorMessage.length();
+			}
+
+			return;
+		}
+		
+		parameterMap.put("Content-Type", new Tika().detect(path.getFileName().toString()));
+
+		try {
+			fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
+			contentLength = fileChannel.size();
+		} catch (IOException e) {
+			httpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR;
+		}
+		
+		if (httpMethod.equals(HttpMethod.HEAD))
+			fileChannel = null;
+		
+
+		
+	};
 	
-	public String getHeader(){
+	public String getHeader() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(String.format("%s %s\r\n", httpVersion.getVersion(), httpStatusCode.toString()));
-		sb.append(String.format("Date: %s\nContent-Type: %s\nContent-Length: %s\n", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()), contentType, contentLength));
-
+		sb.append(String.format("%s %s\n", httpVersion.getVersion(), httpStatusCode.toString()));
+		sb.append(String.format("Date: %s\nContent-Length: %s\n", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()), contentLength));
+		
 		for (String key : parameterMap.keySet())
-			sb.append(String.format("%s:%s", key, parameterMap.get(key)));
+			sb.append(String.format("%s:%s\n", key, parameterMap.get(key)));
 		
-		sb.append("\r\n");
-		
-		return sb.toString();
+		return sb.append("\r\n").toString();
 	}
 
-	public AsynchronousFileChannel getFileChannel(){
+	public AsynchronousFileChannel getFileChannel() {
 		return fileChannel;
 	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 	
-	public static class Builder{
-		private HttpRequest request;
-		private Map<String, String> parameterMap = new HashMap<String, String>();
-		private HttpStatusCode httpStatusCode = null;
-		private String contentType = null;
-		private Long contentLength = 0l;
-		private AsynchronousFileChannel fileChannel;
-
-		private Builder(HttpRequest request){
-			this.request = request;
-		};
-		
-		public static Builder create(HttpRequest request){
-			return new Builder(request);
-		}
-		
-		public HttpResponse build() {
-			HttpResponse response = new HttpResponse();
-			response.parameterMap = parameterMap;
-			response.httpVersion = request.getHTTPVersion();
-
-			response.path = request.getAbsolutePath();
-			addFileChannel(request.getAbsolutePath());
-			
-			response.httpStatusCode = httpStatusCode == null ? HttpStatusCode.OK : httpStatusCode;
-			response.contentType = contentType;
-			response.contentLength = contentLength;
-			response.fileChannel = fileChannel;
-
-			return response;
-		}
-
-		private void addFileChannel(String filePath) {
-			Path path = evaluatePath(filePath);	
-			
-			if (path == null && httpStatusCode == null){
-				httpStatusCode = HttpStatusCode.NOT_FOUND;
-				path = Paths.get("html/404.html");
-			}
-			
-			if (path == null)
-				return;
-
-			this.contentType = new Tika().detect(path.getFileName().toString());
-
-			try {
-				this.fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
-				this.contentLength = this.fileChannel.size();
-			} catch (IOException e) {
-				httpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR;
-			}
-		}
-
-		private Path evaluatePath(String requestedPath) {
-			if (requestedPath == null || requestedPath.contains("..")){
-				this.httpStatusCode = HttpStatusCode.BAD_REQUEST;
-				return null;
-			}
-			
-			// Default file path
-			Path path = Paths.get(requestedPath);
-			File file = path.toFile();
-			if (file.exists()){
-				if (file.isFile())
-					return path;
-				
-				if (requestedPath.endsWith("/"))
-					return evaluatePath(requestedPath.concat("index.html"));
-
-				this.httpStatusCode = HttpStatusCode.MOVED_PERMANENTLY;
-				this.parameterMap.put("Location", request.getPath().concat("/"));
-
-				return null;
-			}
-			
-			// Ending .htm / .html: file exists for other ending?
-			if (requestedPath.endsWith(".htm") || requestedPath.endsWith(".html")){
-				requestedPath = requestedPath.endsWith("m") ? requestedPath.concat("l") : requestedPath.substring(0, requestedPath.length()-1);
-				if (new File(requestedPath).exists())
-					return evaluatePath(requestedPath);
-				else
-					return null;	
-			}
-			
+	private Path evaluatePath(String docRoot, String requestedPath) {
+		if (requestedPath == null || requestedPath.contains("..")) {
+			httpStatusCode = HttpStatusCode.BAD_REQUEST;
 			return null;
 		}
+		
+		String absolutePath = docRoot.concat(requestedPath);
+		
+		// does file exist??
+		Path path = Paths.get(absolutePath);
+		File file = path.toFile();
+		if (file.exists()) {
+			if (file.isFile())
+				return path;
+			
+			// if directory doesn't end with '/', add it to url
+			if (!requestedPath.endsWith("/")) {
+				httpStatusCode = HttpStatusCode.MOVED_PERMANENTLY;
+				parameterMap.put("Location", requestedPath.concat("/"));
+				
+				return null;
+			}
+			
+			// if no file is given, try index.html
+			return evaluatePath(docRoot, requestedPath.concat("index.html"));
+		}
+		
+		httpStatusCode = HttpStatusCode.NOT_FOUND;
+		return null;
 	}
+	
 
-	public String getFilename() {
-		return path;
-	}
+	private enum HttpVersion {
+		HTTP09("HTTP/0.9"),
+		HTTP10("HTTP/1.0"),
+		HTTP11("HTTP/1.1");
+
+		private String version;
+
+		HttpVersion(String version) {
+			this.version = version;
+		}
+
+		public String getVersion() {
+			return version;
+		}
+
+		public static HttpVersion get(String s) {
+			for (HttpVersion httpVersion : HttpVersion.values()) {
+				if (httpVersion.getVersion().equals(s))
+					return httpVersion;
+			}
+
+			return null;
+		}
+
+	}	
 }
