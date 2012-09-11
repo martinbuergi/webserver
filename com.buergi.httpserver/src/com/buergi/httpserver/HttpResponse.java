@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ public class HttpResponse {
 	private AsynchronousFileChannel fileChannel;
 	private long contentLength = 0;
 	private Map<String, String> parameterMap;
+	
+	private String path;
 	
 
 	private HttpResponse(){};
@@ -36,10 +39,6 @@ public class HttpResponse {
 		return sb.toString();
 	}
 
-	public int getContentLength(){
-		return Integer.valueOf(String.valueOf(contentLength));
-	}
-	
 	public AsynchronousFileChannel getFileChannel(){
 		return fileChannel;
 	}
@@ -65,13 +64,14 @@ public class HttpResponse {
 			response.parameterMap = parameterMap;
 			response.httpVersion = request.getHTTPVersion();
 
+			response.path = request.getAbsolutePath();
 			addFileChannel(request.getAbsolutePath());
 			
 			response.httpStatusCode = httpStatusCode == null ? HttpStatusCode.OK : httpStatusCode;
 			response.contentType = contentType;
 			response.contentLength = contentLength;
 			response.fileChannel = fileChannel;
-			
+
 			return response;
 		}
 
@@ -89,7 +89,7 @@ public class HttpResponse {
 			this.contentType = new Tika().detect(path.getFileName().toString());
 
 			try {
-				this.fileChannel = AsynchronousFileChannel.open(path);
+				this.fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
 				this.contentLength = this.fileChannel.size();
 			} catch (IOException e) {
 				httpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR;
@@ -129,5 +129,9 @@ public class HttpResponse {
 			
 			return null;
 		}
+	}
+
+	public String getFilename() {
+		return path;
 	}
 }

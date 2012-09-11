@@ -7,8 +7,6 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class HttpRequest {
 	private HttpMethod httpMethod;
@@ -37,11 +35,9 @@ public class HttpRequest {
 	}
 
 	public static class Builder{
-		private static int bufferSize = 1024;
-
 		private Builder(){};
 		
-		public static HttpRequest build(AsynchronousSocketChannel ch, String root){
+		public static HttpRequest build(AsynchronousSocketChannel ch, String root, int bufferSize){
 			HttpRequest request = new HttpRequest();
 			
 			ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
@@ -50,9 +46,10 @@ public class HttpRequest {
 			
 			try {
 				int x;
-				while ((x = ch.read(readBuffer).get(10, TimeUnit.SECONDS)) != -1) {
+				while ((x = ch.read(readBuffer).get()) != -1) {
+					readBuffer.flip();
 					sb.append(new String(readBuffer.array()));
-					readBuffer.rewind();
+
 					if (x < bufferSize)
 						break;
 				}
@@ -62,13 +59,9 @@ public class HttpRequest {
 			} catch (ExecutionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (TimeoutException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 							
 			String lines[] = sb.toString().split("\\r?\\n");
-//				lines = URLDecoder.decode(sb.toString(), "UTF-8").split("\\r?\\n");
 			String[] initialLine = lines[0].split(" ", 3);
 			try {
 				request.httpMethod = HttpMethod.get(initialLine[0]);
