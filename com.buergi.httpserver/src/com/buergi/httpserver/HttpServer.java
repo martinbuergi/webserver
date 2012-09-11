@@ -86,6 +86,8 @@ public class HttpServer {
 
 		public void handle()  {
 			try{
+				
+				// if requestHeader is empty, close channel
 				String requestHeader = readChannel();
 				if (requestHeader.isEmpty()) {
 					ch.close();
