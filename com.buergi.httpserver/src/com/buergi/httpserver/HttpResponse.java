@@ -45,8 +45,8 @@ public class HttpResponse {
 
 		// get message
 		Path path = evaluatePath(docRoot, request.getPath());	
-		if (path == null){
-			if ("45".contains(httpStatusCode.toString().substring(0, 1))){
+		if (path == null) {
+			if ("45".contains(httpStatusCode.toString().substring(0, 1))) {
 				errorMessage = String.format("<html><header>Server error:</header>%s<body></body></html>", httpStatusCode);
 				contentLength = errorMessage.length();
 			}

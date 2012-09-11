@@ -19,7 +19,7 @@ public class HttpServer {
 		int port = 8080;
 		int bufferSize = 2*1024;
 
-		if (args.length == 0){
+		if (args.length == 0) {
             System.err.println("Please specify document root directory");
             System.exit(1);
           }
@@ -87,7 +87,7 @@ public class HttpServer {
 		public void handle()  {
 			try{
 				String requestHeader = readChannel();
-				if (requestHeader.isEmpty()){
+				if (requestHeader.isEmpty()) {
 					ch.close();
 					return;
 				}
@@ -146,7 +146,7 @@ public class HttpServer {
 			while (fCh.read(readBuffer, pos).get() >= 0) {
 				readBuffer.flip();
 				Future<Integer> future = ch.write(readBuffer);
-				while (!future.isDone()){};
+				while (!future.isDone()) {};
 				readBuffer.clear();
 
 				pos = pos + bufferSize;

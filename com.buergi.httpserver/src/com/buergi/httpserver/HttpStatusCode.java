@@ -19,7 +19,7 @@ public enum HttpStatusCode {
 
 	private String message;
 
-	HttpStatusCode(String message){
+	HttpStatusCode(String message) {
 		this.message = message;
 	}
 
