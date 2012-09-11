@@ -86,7 +86,13 @@ public class HttpServer {
 
 		public void handle()  {
 			try{
-				HttpRequest request = new HttpRequest(readChannel());
+				String requestHeader = readChannel();
+				if (requestHeader.isEmpty()){
+					ch.close();
+					return;
+				}
+
+				HttpRequest request = new HttpRequest(requestHeader);
 				HttpResponse response = new HttpResponse(request, root);
 
 				// Write header

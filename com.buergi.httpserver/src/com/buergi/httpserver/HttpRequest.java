@@ -14,6 +14,7 @@ public class HttpRequest {
 	public HttpRequest(String requestHeader){
 		String lines[] = requestHeader.toString().split("\\r?\\n");
 		initialLines = lines[0].split(" ", 3);
+		
 		path = initialLines[1];
 
 		Map<String, String> parameterMap = new HashMap<String, String>();
