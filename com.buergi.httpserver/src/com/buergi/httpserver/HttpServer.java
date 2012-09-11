@@ -50,8 +50,8 @@ public class HttpServer {
 			AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(50));
 			final AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group).bind(new InetSocketAddress(port));
 
-			System.out.println("Server listening on " + port);
-			System.out.println("root directory is " + root);
+			System.out.println("Server listening on port " + port);
+			System.out.println("document root directory is " + root);
 			System.out.println("buffersize is " + bufferSize);
 			
 			server.accept("Client connection",
