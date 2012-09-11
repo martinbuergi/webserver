@@ -137,10 +137,8 @@ public class HttpServer {
 			}
 
 			AsynchronousFileChannel fCh = httpResponse.getFileChannel();
-			
 			if (fCh == null)
 				return;
-
 			
 			ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
 			int pos = 0;
