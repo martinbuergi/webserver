@@ -13,6 +13,18 @@ import java.util.Map;
 
 import org.apache.tika.Tika;
 
+/**
+ * @author martinbuergi
+ *
+ * If request is OK, it provides an asynchronous file channel containing the response.
+ * Otherwise an error message is created for response.
+ * 
+ * Directory requests return 'index.html' if it exists 
+ * 
+ * POST requests are handled like GET requests.
+ * 
+ */
+
 public class HttpResponse {
 	private HttpVersion httpVersion;
 	private HttpStatusCode httpStatusCode;
@@ -21,7 +33,6 @@ public class HttpResponse {
 	private String errorMessage;
 	private long contentLength;
 	
-
 	public HttpResponse(HttpRequest request, String docRoot) {
 		parameterMap = new HashMap<String, String>();
 		httpStatusCode = HttpStatusCode.OK;
@@ -44,7 +55,7 @@ public class HttpResponse {
 		}
 
 		// get message
-		Path path = evaluatePath(docRoot, request.getPath());	
+		Path path = createPath(docRoot, request.getPath());	
 		if (path == null) {
 			if ("45".contains(httpStatusCode.toString().substring(0, 1))) {
 				errorMessage = String.format("<html><header>Server error:</header>%s<body></body></html>", httpStatusCode);
@@ -89,7 +100,7 @@ public class HttpResponse {
 		return errorMessage;
 	}
 	
-	private Path evaluatePath(String docRoot, String requestedPath) {
+	private Path createPath(String docRoot, String requestedPath) {
 		if (requestedPath == null || requestedPath.contains("..")) {
 			httpStatusCode = HttpStatusCode.BAD_REQUEST;
 			return null;
@@ -113,7 +124,7 @@ public class HttpResponse {
 			}
 			
 			// if no file is given, try index.html
-			return evaluatePath(docRoot, requestedPath.concat("index.html"));
+			return createPath(docRoot, requestedPath.concat("index.html"));
 		}
 		
 		httpStatusCode = HttpStatusCode.NOT_FOUND;

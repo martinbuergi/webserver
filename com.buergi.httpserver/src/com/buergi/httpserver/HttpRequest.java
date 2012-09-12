@@ -6,7 +6,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author martinbuergi
+ *
+ * Splits request string into lines.
+ * First line contains "method url version"
+ * Optional other lines contain parameters
+ *  
+ * Checks for parameters in url
+ * 
+ */
+
 public class HttpRequest {
+	private static String DEFAULT_ENCODING = "UTF-8";
 	private String[] initialLines;
 	private String path;
 	public Map<String, String> parameterMap;
@@ -31,7 +43,7 @@ public class HttpRequest {
 		}
 		
 		try {
-			path = URLDecoder.decode(path, "UTF-8");
+			path = URLDecoder.decode(path, DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			System.err.println("Unsupported Encoding error: " + e.getMessage());
 		}
@@ -65,8 +77,8 @@ public class HttpRequest {
 			String value = c == -1 ? "" : parameter.substring(c+1).trim();
 			
 			try {
-				key = URLDecoder.decode(key, "UTF-8");
-				value = URLDecoder.decode(value, "UTF-8");
+				key = URLDecoder.decode(key, DEFAULT_ENCODING);
+				value = URLDecoder.decode(value, DEFAULT_ENCODING);
 			} catch (UnsupportedEncodingException e) {}
 			
 			parameterMap.put(key, value);

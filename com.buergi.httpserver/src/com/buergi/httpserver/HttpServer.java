@@ -14,6 +14,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author martinbuergi
+ *
+ * This is the main class. It manages asynchronous all client connections.
+ * Every accepted connection is handled in its own instance of a Worker inner class.
+ * 
+ * Worker class parses the request, creates a response and sends it back to the client.
+ * To keep it simple, all requests are handled the same way.
+ * 
+ */
+
 public class HttpServer {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		int port = 8080;
@@ -63,7 +74,7 @@ public class HttpServer {
 					}
 
 					public void failed(Throwable exc, Object att) {
-						System.err.println("Failed to accept connection");
+						System.err.println("Failed to accept a connection");
 					}
 				}
 			);
@@ -77,6 +88,7 @@ public class HttpServer {
 		}
 	}
 
+	
 	private class Worker {
 		private AsynchronousSocketChannel ch;
 
@@ -84,7 +96,7 @@ public class HttpServer {
 			this.ch = ch;
 		};
 
-		public void handle()  {
+		public void handle() {
 			try{
 				
 				// if requestHeader is empty, close channel
