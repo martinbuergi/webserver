@@ -7,7 +7,7 @@ import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
 import com.buergi.webserver.services.HttpResponseService;
 
-public class HttpProtocol10 implements HttpRequest{
+public class HttpProtocol10Impl implements HttpRequest{
 
 	private String version;
 	private String method;
@@ -15,7 +15,7 @@ public class HttpProtocol10 implements HttpRequest{
 	private String path;
 	private HttpResponseService httpResponseService;
 	
-	public HttpProtocol10(String version, String method, String path, Map<String, String> parameterMap, HttpResponseService httpResponseService) {
+	public HttpProtocol10Impl(String version, String method, String path, Map<String, String> parameterMap, HttpResponseService httpResponseService) {
 		this.version = version;
 		this.method = method.toUpperCase();
 		this.path = path;
