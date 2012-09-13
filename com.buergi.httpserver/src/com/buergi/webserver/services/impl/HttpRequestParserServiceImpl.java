@@ -9,10 +9,10 @@ import java.util.Set;
 
 import com.buergi.webserver.http.HttpRequest;
 import com.buergi.webserver.http.HttpResponse;
-import com.buergi.webserver.services.RequestParserService;
+import com.buergi.webserver.services.HttpRequestParserService;
 import com.google.inject.Inject;
 
-public class RequestParserServiceImpl implements RequestParserService {
+public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 	private static String DEFAULT_ENCODING = "UTF-8";
 
 	@Inject private Set<HttpRequest> httpRequestProtocols;

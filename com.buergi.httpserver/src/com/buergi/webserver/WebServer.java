@@ -3,11 +3,11 @@ package com.buergi.webserver;
 import com.buergi.webserver.http.impl.HttpRequest10Impl;
 import com.buergi.webserver.http.impl.HttpRequest11Impl;
 import com.buergi.webserver.services.HttpResponseService;
-import com.buergi.webserver.services.RequestParserService;
+import com.buergi.webserver.services.HttpRequestParserService;
 import com.buergi.webserver.services.WebServerService;
 import com.buergi.webserver.services.WorkerService;
 import com.buergi.webserver.services.impl.HttpResponseServiceImpl;
-import com.buergi.webserver.services.impl.RequestParserServiceImpl;
+import com.buergi.webserver.services.impl.HttpRequestParserServiceImpl;
 import com.buergi.webserver.services.impl.WebServerServiceImpl;
 import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerBufferSize;
 import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerDocRoot;
@@ -56,7 +56,7 @@ public class WebServer extends AbstractModule {
 	protected void configure() {
 		bind(WebServerService.class).to(WebServerServiceImpl.class);
 		bind(WorkerService.class).to(WorkerServiceImpl.class);
-		bind(RequestParserService.class).to(RequestParserServiceImpl.class);
+		bind(HttpRequestParserService.class).to(HttpRequestParserServiceImpl.class);
 		bind(HttpResponseService.class).to(HttpResponseServiceImpl.class);
 		
 		bind(String.class).annotatedWith(ServerDocRoot.class).toInstance(docRoot);

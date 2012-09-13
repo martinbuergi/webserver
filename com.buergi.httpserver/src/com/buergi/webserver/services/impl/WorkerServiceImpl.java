@@ -7,14 +7,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import com.buergi.webserver.http.HttpResponse;
-import com.buergi.webserver.services.RequestParserService;
+import com.buergi.webserver.services.HttpRequestParserService;
 import com.buergi.webserver.services.WorkerService;
 import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerBufferSize;
 import com.google.inject.Inject;
 
 public class WorkerServiceImpl implements WorkerService {
 	@Inject @ServerBufferSize Integer bufferSize;
-	@Inject private RequestParserService requestParserService; 
+	@Inject private HttpRequestParserService requestParserService; 
 	
 	public void handle(AsynchronousSocketChannel ch) {
 		try{
