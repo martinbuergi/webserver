@@ -1,15 +1,19 @@
 package com.buergi.webserver.http.impl;
 
-import java.util.Map;
+import com.buergi.webserver.http.HttpRequest;
+import com.google.inject.multibindings.Multibinder;
 
-import com.buergi.webserver.services.HttpResponseService;
 
+public class HttpRequest11Impl extends HttpRequest10Impl{
 
-public class HttpRequest11Impl extends HttpRequestl10Impl{
+	public String getVersion(){
+		return "HTTP/1.1";
+	}
 
-	// To be defined
-	public HttpRequest11Impl(String version, String method, String path, Map<String, String> parameterMap, HttpResponseService httpResponseService) {
-		super(version, method, path, parameterMap, httpResponseService);
+	@Override
+	protected void configure() {
+		Multibinder<HttpRequest> httpRequestBinder = Multibinder.newSetBinder(binder(), HttpRequest.class);
+		httpRequestBinder.addBinding().to(HttpRequest11Impl.class);
 	}
 
 }

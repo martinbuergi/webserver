@@ -6,25 +6,15 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.buergi.webserver.http.HttpRequest;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.services.RequestParserService;
 import com.buergi.webserver.services.WorkerService;
 import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerBufferSize;
-import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerDocRoot;
 import com.google.inject.Inject;
 
 public class WorkerServiceImpl implements WorkerService {
-	private String docRoot;
-	private Integer bufferSize;
+	@Inject @ServerBufferSize Integer bufferSize;
 	@Inject private RequestParserService requestParserService; 
-
-	@Inject
-	WorkerServiceImpl(@ServerDocRoot String docRoot, @ServerBufferSize Integer bufferSize) {
-		this.docRoot = docRoot;
-		this.bufferSize = bufferSize;
-	};
-
 	
 	public void handle(AsynchronousSocketChannel ch) {
 		try{
@@ -35,9 +25,7 @@ public class WorkerServiceImpl implements WorkerService {
 				return;
 			}
 
-			HttpRequest httpRequest = requestParserService.createRequest(requestHeader);
-//			HttpRequest2 httpRequest = requestParserService.createRequest(requestHeader);
-			HttpResponse httpResponse = httpRequest.createResponse(docRoot);
+			HttpResponse httpResponse = requestParserService.createResponse(requestHeader);
 
 			// Write header
 			ch.write(ByteBuffer.wrap(httpResponse.getHeader().getBytes())).get();
@@ -74,11 +62,6 @@ public class WorkerServiceImpl implements WorkerService {
 
 	
 	private void writeMessage(HttpResponse httpResponse, AsynchronousSocketChannel ch) throws InterruptedException, ExecutionException, IOException {
-//
-//		AsynchronousFileChannel fCh = httpResponse.getFileChannel();
-//		if (fCh == null)
-//			return;
-//		
 		ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
 		int pos = 0;
 
@@ -90,7 +73,5 @@ public class WorkerServiceImpl implements WorkerService {
 
 			pos = pos + bufferSize;
 		}
-		
-//		fCh.close();
 	}
 }

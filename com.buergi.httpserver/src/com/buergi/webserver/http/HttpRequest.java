@@ -1,8 +1,10 @@
 package com.buergi.webserver.http;
 
+import java.util.Map;
+
 
 public interface HttpRequest {
 
-	public HttpResponse createResponse(String docRoot);
-	public String getMethod();
+	public String getVersion();
+	public HttpResponse createResponse(String method, String path, Map<String, String> parameterMap);
 }

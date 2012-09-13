@@ -45,17 +45,10 @@ public class WebServerServiceImpl implements WebServerService {
 	public @interface ServerPort {}
 	
 	
-	private int port;
-	private String docRoot;
-	private int bufferSize;
+	@Inject @ServerPort private int port;
+	@Inject @ServerDocRoot private String docRoot;
+	@Inject @ServerBufferSize private int bufferSize;
 	@Inject private WorkerService workerService;
-
-	@Inject
-	WebServerServiceImpl(@ServerDocRoot String docRoot, @ServerPort int port, @ServerBufferSize int bufferSize){
-		this.port = port;
-		this.docRoot = docRoot;
-		this.bufferSize = bufferSize;		
-	}
 
 	public void start() {
 		try {

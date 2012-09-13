@@ -5,18 +5,19 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.buergi.webserver.http.HttpRequest;
-import com.buergi.webserver.services.HttpRequestService;
+import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.services.RequestParserService;
 import com.google.inject.Inject;
 
 public class RequestParserServiceImpl implements RequestParserService {
 	private static String DEFAULT_ENCODING = "UTF-8";
 
-	@Inject private HttpRequestService httpRequestService;
-
-	public HttpRequest createRequest(String requestHeader){
+	@Inject private Set<HttpRequest> httpRequestProtocols;
+	
+	public HttpResponse createResponse(String requestHeader){
 		String lines[] = requestHeader.toString().split("\\r?\\n");
 		String[] initialLines = lines[0].split(" ", 3);
 		
@@ -41,9 +42,18 @@ public class RequestParserServiceImpl implements RequestParserService {
 			System.err.println("Unsupported Encoding error: " + e.getMessage());
 		}
 
+		HttpRequest httpRequest = null;
+		for (HttpRequest hr : httpRequestProtocols){
+			if (hr.getVersion().equals(initialLines[2])){
+				httpRequest = hr;
+				break;
+			}
+		}
 		
-		return httpRequestService.createRequestInstance(initialLines[2], initialLines[0], path, parameterMap); 
-
+		if (httpRequest == null)
+			httpRequest = httpRequestProtocols.iterator().next();
+		
+		return httpRequest.createResponse(initialLines[0], path, parameterMap); 
 	}
 
 	private void addParameterToMap(String[] parameters, String delimiter, Map<String, String> parameterMap) {
