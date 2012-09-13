@@ -26,7 +26,7 @@ public class WebServer extends AbstractModule {
 	}
 
 	/**
-	 * Annotates HttpServerContext.
+	 * Annotates HttpServerContext
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.PARAMETER})
