@@ -19,6 +19,8 @@ public class HttpRequest10Impl extends AbstractModule implements HttpRequest {
 	}
 	
 	public HttpResponse createResponse(String method, String path, Map<String, String> parameterMap) {
+		parameterMap.clear();
+		
 		// check httpMethod
 		if (method == null)
 			return httpResponseService.createErrorResponse(getVersion(), HttpStatusCode.BAD_REQUEST, parameterMap);
