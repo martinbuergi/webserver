@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.buergi.webserver.http.HttpMethod;
 import com.buergi.webserver.http.HttpRequest;
+import com.buergi.webserver.http.HttpVersion;
 import com.buergi.webserver.services.RequestParserService;
 
 public class RequestParserServiceImpl implements RequestParserService {
@@ -37,7 +39,10 @@ public class RequestParserServiceImpl implements RequestParserService {
 			System.err.println("Unsupported Encoding error: " + e.getMessage());
 		}
 
-		return new HttpRequest(initialLines[0], initialLines[2], path, parameterMap); 
+		HttpMethod httpMethod = HttpMethod.get(initialLines[0]);
+		HttpVersion httpVersion = HttpVersion.get(initialLines[2]);
+		
+		return new HttpRequest(httpMethod, httpVersion, path, parameterMap); 
 
 	}
 

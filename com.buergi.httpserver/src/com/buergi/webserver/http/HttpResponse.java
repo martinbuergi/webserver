@@ -40,7 +40,7 @@ public class HttpResponse {
 		contentLength = 0;
 		
 		// check httpVersion
-		httpVersion = HttpVersion.get(request.getHTTPVersion());
+		httpVersion = request.getHTTPVersion();
 		if (httpVersion == null) {
 			httpVersion = HttpVersion.HTTP10;
 			httpStatusCode = HttpStatusCode.BAD_REQUEST;
@@ -48,7 +48,7 @@ public class HttpResponse {
 		}
 		
 		// check httpMethod
-		HttpMethod httpMethod = HttpMethod.get(request.getHTTPMethod());
+		HttpMethod httpMethod = request.getHTTPMethod();
 		if (httpMethod == null) {
 			httpStatusCode = HttpStatusCode.NOT_IMPLEMENTED;
 			return;
@@ -132,45 +132,7 @@ public class HttpResponse {
 	}
 	
 
-	private enum HttpVersion {
-		HTTP09("HTTP/0.9"),
-		HTTP10("HTTP/1.0"),
-		HTTP11("HTTP/1.1");
 
-		private String version;
-
-		HttpVersion(String version) {
-			this.version = version;
-		}
-
-		public String getVersion() {
-			return version;
-		}
-
-		public static HttpVersion get(String s) {
-			for (HttpVersion httpVersion : HttpVersion.values()) {
-				if (httpVersion.getVersion().equals(s))
-					return httpVersion;
-			}
-
-			return null;
-		}
-	}
 	
-	private enum HttpMethod {
-		GET, POST, HEAD;
-		
-		public static HttpMethod get(String s) {
-			s = s.toUpperCase();
-			
-			if (s.equals("GET"))
-				return HttpMethod.GET;
-			else if (s.equals("POST"))
-				return HttpMethod.POST;
-			else if (s.equals("HEAD"))
-				return HttpMethod.HEAD;
-			
-			return null;
-		}
-	}	
+	
 }

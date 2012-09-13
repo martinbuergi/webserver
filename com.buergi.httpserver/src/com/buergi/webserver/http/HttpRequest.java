@@ -3,23 +3,23 @@ package com.buergi.webserver.http;
 import java.util.Map;
 
 public class HttpRequest {
-	private String httpMethod;
-	private String httpVersion;
+	private HttpMethod httpMethod;
+	private HttpVersion httpVersion;
 	private String path;
 	public Map<String, String> parameterMap;
 	
-	public HttpRequest(String httpMethod, String httpVersion, String path, Map<String, String> parameterMap){
+	public HttpRequest(HttpMethod httpMethod, HttpVersion httpVersion, String path, Map<String, String> parameterMap){
 		this.httpMethod = httpMethod;
 		this.httpVersion = httpVersion;
 		this.path = path;
 		this.parameterMap = parameterMap;
 	};
 	
-	public String getHTTPMethod() {
+	public HttpMethod getHTTPMethod() {
 		return httpMethod;
 	}
 	
-	public String getHTTPVersion() {
+	public HttpVersion getHTTPVersion() {
 		return httpVersion;
 	}
 		
