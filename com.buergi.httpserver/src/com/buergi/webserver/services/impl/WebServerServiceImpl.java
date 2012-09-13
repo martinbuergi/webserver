@@ -54,7 +54,7 @@ public class WebServerServiceImpl implements WebServerService {
 	WebServerServiceImpl(@ServerDocRoot String docRoot, @ServerPort int port, @ServerBufferSize int bufferSize){
 		this.port = port;
 		this.docRoot = docRoot;
-		this.bufferSize = bufferSize;
+		this.bufferSize = bufferSize;		
 	}
 
 	public void start() {

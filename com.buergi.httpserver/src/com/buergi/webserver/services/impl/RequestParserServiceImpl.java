@@ -6,13 +6,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.buergi.webserver.http.HttpMethod;
 import com.buergi.webserver.http.HttpRequest;
-import com.buergi.webserver.http.HttpVersion;
+import com.buergi.webserver.services.HttpRequestService;
 import com.buergi.webserver.services.RequestParserService;
+import com.google.inject.Inject;
 
 public class RequestParserServiceImpl implements RequestParserService {
 	private static String DEFAULT_ENCODING = "UTF-8";
+
+	@Inject private HttpRequestService httpRequestService;
 
 	public HttpRequest createRequest(String requestHeader){
 		String lines[] = requestHeader.toString().split("\\r?\\n");
@@ -39,10 +41,8 @@ public class RequestParserServiceImpl implements RequestParserService {
 			System.err.println("Unsupported Encoding error: " + e.getMessage());
 		}
 
-		HttpMethod httpMethod = HttpMethod.get(initialLines[0]);
-		HttpVersion httpVersion = HttpVersion.get(initialLines[2]);
 		
-		return new HttpRequest(httpMethod, httpVersion, path, parameterMap); 
+		return httpRequestService.createRequestInstance(initialLines[2], initialLines[0], path, parameterMap); 
 
 	}
 

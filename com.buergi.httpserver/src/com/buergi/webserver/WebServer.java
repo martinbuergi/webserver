@@ -1,8 +1,12 @@
 package com.buergi.webserver;
 
+import com.buergi.webserver.services.HttpRequestService;
+import com.buergi.webserver.services.HttpResponseService;
 import com.buergi.webserver.services.RequestParserService;
 import com.buergi.webserver.services.WebServerService;
 import com.buergi.webserver.services.WorkerService;
+import com.buergi.webserver.services.impl.HttpRequestServiceImpl;
+import com.buergi.webserver.services.impl.HttpResponseServiceImpl;
 import com.buergi.webserver.services.impl.RequestParserServiceImpl;
 import com.buergi.webserver.services.impl.WebServerServiceImpl;
 import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerBufferSize;
@@ -38,7 +42,7 @@ public class WebServer extends AbstractModule {
 		
 		Injector injector = Guice.createInjector(new WebServer(docRoot, port, bufferSize));
 		WebServerService httpServer = injector.getInstance(WebServerService.class);
-		httpServer.start();
+		httpServer.start();				
 	}
 	
 	
@@ -53,9 +57,11 @@ public class WebServer extends AbstractModule {
 		bind(WebServerService.class).to(WebServerServiceImpl.class);
 		bind(WorkerService.class).to(WorkerServiceImpl.class);
 		bind(RequestParserService.class).to(RequestParserServiceImpl.class);
-	    
-		bindConstant().annotatedWith(ServerDocRoot.class).to(docRoot);
-	    bindConstant().annotatedWith(ServerPort.class).to(port);
-	    bindConstant().annotatedWith(ServerBufferSize.class).to(bufferSize);
+		bind(HttpRequestService.class).to(HttpRequestServiceImpl.class);
+		bind(HttpResponseService.class).to(HttpResponseServiceImpl.class);
+		
+		bind(String.class).annotatedWith(ServerDocRoot.class).toInstance(docRoot);
+	    bind(Integer.class).annotatedWith(ServerPort.class).toInstance(port);
+	    bind(Integer.class).annotatedWith(ServerBufferSize.class).toInstance(bufferSize);
 	}
 }

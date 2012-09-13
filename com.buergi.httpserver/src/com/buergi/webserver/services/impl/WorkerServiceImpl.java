@@ -2,7 +2,6 @@ package com.buergi.webserver.services.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -18,7 +17,7 @@ import com.google.inject.Inject;
 public class WorkerServiceImpl implements WorkerService {
 	private String docRoot;
 	private Integer bufferSize;
-	@Inject RequestParserService requestParserService; 
+	@Inject private RequestParserService requestParserService; 
 
 	@Inject
 	WorkerServiceImpl(@ServerDocRoot String docRoot, @ServerBufferSize Integer bufferSize) {
@@ -36,14 +35,15 @@ public class WorkerServiceImpl implements WorkerService {
 				return;
 			}
 
-			HttpRequest request = requestParserService.createRequest(requestHeader);
-			HttpResponse response = new HttpResponse(request, docRoot);
+			HttpRequest httpRequest = requestParserService.createRequest(requestHeader);
+//			HttpRequest2 httpRequest = requestParserService.createRequest(requestHeader);
+			HttpResponse httpResponse = httpRequest.createResponse(docRoot);
 
 			// Write header
-			ch.write(ByteBuffer.wrap(response.getHeader().getBytes())).get();
+			ch.write(ByteBuffer.wrap(httpResponse.getHeader().getBytes())).get();
 			
 			// Write message
-			writeMessage(response, ch);
+			writeMessage(httpResponse, ch);
 
 			ch.close();
 		} catch (IOException e) {
@@ -74,20 +74,15 @@ public class WorkerServiceImpl implements WorkerService {
 
 	
 	private void writeMessage(HttpResponse httpResponse, AsynchronousSocketChannel ch) throws InterruptedException, ExecutionException, IOException {
-		// error message?
-		if (httpResponse.getErrorMessage() != null) {
-			ch.write(ByteBuffer.wrap(httpResponse.getErrorMessage().getBytes()));
-			return;
-		}
-
-		AsynchronousFileChannel fCh = httpResponse.getFileChannel();
-		if (fCh == null)
-			return;
-		
+//
+//		AsynchronousFileChannel fCh = httpResponse.getFileChannel();
+//		if (fCh == null)
+//			return;
+//		
 		ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
 		int pos = 0;
 
-		while (fCh.read(readBuffer, pos).get() >= 0) {
+		while (httpResponse.readMessage(readBuffer, pos) >= 0) {
 			readBuffer.flip();
 			Future<Integer> future = ch.write(readBuffer);
 			while (!future.isDone()) {};
@@ -96,6 +91,6 @@ public class WorkerServiceImpl implements WorkerService {
 			pos = pos + bufferSize;
 		}
 		
-		fCh.close();
+//		fCh.close();
 	}
 }
