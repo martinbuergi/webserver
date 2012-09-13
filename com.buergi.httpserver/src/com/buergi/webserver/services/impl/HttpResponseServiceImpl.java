@@ -1,7 +1,14 @@
 package com.buergi.webserver.services.impl;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
+
+import org.apache.tika.Tika;
 
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
@@ -25,15 +32,34 @@ public class HttpResponseServiceImpl implements HttpResponseService {
 		FileObject fo = createPath(path);
 		HttpStatusCode hsc = fo.getHttpStatusCode();
 		
-		if (hsc.equals(HttpStatusCode.OK))
-			return HttpResponseFileImpl.create(version, method, hsc, fo.getPath(), parameterMap);
-		
 		if (hsc.equals(HttpStatusCode.MOVED_PERMANENTLY)){
 			parameterMap.put("Location", fo.getPath());
 			return HttpResponseErrorImpl.create(version, hsc, parameterMap);			
 		}
 
-		return HttpResponseErrorImpl.create(version, fo.getHttpStatusCode(), parameterMap);
+		if ("45".contains(hsc.toString().substring(0, 1)))
+			return HttpResponseErrorImpl.create(version, fo.getHttpStatusCode(), parameterMap);
+
+		
+		// file is ready
+		Path pathObj = Paths.get(fo.getPath());
+		
+		parameterMap.put("Content-Type", new Tika().detect(pathObj.getFileName().toString()));
+		AsynchronousFileChannel fileChannel;
+		long contentLength = 0;
+		
+		try {
+			fileChannel = AsynchronousFileChannel.open(pathObj, StandardOpenOption.READ);
+			contentLength = fileChannel.size();
+		} catch (IOException e) {
+			return HttpResponseErrorImpl.create(version, HttpStatusCode.INTERNAL_SERVER_ERROR, parameterMap);
+		}
+		
+		if (method.equals("HEAD"))
+			fileChannel = null;
+		
+		return HttpResponseFileImpl.create(version, fo.getHttpStatusCode(), fileChannel, contentLength, parameterMap);
+
 	}
 	
 	private FileObject createPath(String requestedPath) {
