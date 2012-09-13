@@ -6,6 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.buergi.webserver.http.HttpContext;
+import com.buergi.webserver.http.HttpRequest;
+import com.buergi.webserver.http.impl.HttpRequest10Impl;
+import com.buergi.webserver.http.impl.HttpRequest11Impl;
 import com.buergi.webserver.services.HttpRequestParserService;
 import com.buergi.webserver.services.HttpResponseService;
 import com.buergi.webserver.services.WebServerService;
@@ -16,6 +19,7 @@ import com.buergi.webserver.services.impl.WebServerServiceImpl;
 import com.buergi.webserver.services.impl.WorkerServiceImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
+import com.google.inject.name.Names;
 
 public class WebServer extends AbstractModule {
 
@@ -39,8 +43,9 @@ public class WebServer extends AbstractModule {
 		bind(WebServerService.class).to(WebServerServiceImpl.class);
 		bind(WorkerService.class).to(WorkerServiceImpl.class);
 		bind(HttpRequestParserService.class).to(HttpRequestParserServiceImpl.class);
-		bind(HttpResponseService.class).to(HttpResponseServiceImpl.class);		
-		
+		bind(HttpResponseService.class).to(HttpResponseServiceImpl.class);				
+		bind(HttpRequest.class).annotatedWith(Names.named("HTTP/1.0")).to(HttpRequest10Impl.class);
+		bind(HttpRequest.class).annotatedWith(Names.named("HTTP/1.1")).to(HttpRequest11Impl.class);
 		bind(HttpContext.class).annotatedWith(HttpServerContext.class).toInstance(httpContext);
 	}
 }

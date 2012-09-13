@@ -5,19 +5,24 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import com.buergi.webserver.http.HttpRequest;
 import com.buergi.webserver.http.HttpResponse;
+import com.buergi.webserver.http.HttpStatusCode;
 import com.buergi.webserver.services.HttpRequestParserService;
+import com.buergi.webserver.services.HttpResponseService;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 	private static String DEFAULT_ENCODING = "UTF-8";
 
-	@Inject private Set<HttpRequest> httpRequestProtocols;
-//	@Inject private Inject injector;
-	
+	@Inject Injector injector;
+	@Inject private HttpResponseService httpResponseService;
+
 	public HttpResponse createResponse(String requestHeader){
 		String lines[] = requestHeader.toString().split("\\r?\\n");
 		String[] initialLines = lines[0].split(" ", 3);
@@ -44,16 +49,12 @@ public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 		}
 
 		
-		HttpRequest httpRequest = null;
-		for (HttpRequest hr : httpRequestProtocols){
-			if (hr.getVersion().equals(initialLines[2])){
-				httpRequest = hr;
-				break;
-			}
+		HttpRequest httpRequest;
+		try{
+			httpRequest = injector.getInstance(Key.get(HttpRequest.class, Names.named(initialLines[2])));
+		} catch (ConfigurationException e){
+			return httpResponseService.createErrorResponse(initialLines[2], HttpStatusCode.BAD_REQUEST, parameterMap);			
 		}
-		
-		if (httpRequest == null)
-			httpRequest = httpRequestProtocols.iterator().next();
 		
 		return httpRequest.createResponse(initialLines[0], path, parameterMap); 
 	}

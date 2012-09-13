@@ -4,8 +4,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import com.buergi.webserver.http.HttpContext;
-import com.buergi.webserver.http.impl.HttpRequest10Impl;
-import com.buergi.webserver.http.impl.HttpRequest11Impl;
 import com.buergi.webserver.services.WebServerService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -16,7 +14,7 @@ public class Bootstrap {
 		Configuration configuration = new PropertiesConfiguration(WebServer.class.getResource("properties.config"));
 		HttpContext httpContext = new HttpContext(configuration);
 		
-		Injector injector = Guice.createInjector(new HttpRequest10Impl(), new HttpRequest11Impl(), new WebServer(httpContext));
+		Injector injector = Guice.createInjector(new WebServer(httpContext));
 
 		WebServerService httpServer = injector.getInstance(WebServerService.class);
 		httpServer.start();				
