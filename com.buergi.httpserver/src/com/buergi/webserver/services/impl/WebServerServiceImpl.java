@@ -1,10 +1,6 @@
 package com.buergi.webserver.services.impl;
 
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -13,51 +9,24 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.buergi.webserver.WebServer.HttpServerContext;
+import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.services.WebServerService;
 import com.buergi.webserver.services.WorkerService;
-import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 
 public class WebServerServiceImpl implements WebServerService {
-
-	/**
-	 * Annotates the docRoot.
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.PARAMETER})
-	@BindingAnnotation
-	public @interface ServerDocRoot {}
 	
-	/**
-	 * Annotates the buffSize.
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.PARAMETER})
-	@BindingAnnotation
-	public @interface ServerBufferSize {}
-	
-	/**
-	 * Annotates the port.
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.PARAMETER})
-	@BindingAnnotation
-	public @interface ServerPort {}
-	
-	
-	@Inject @ServerPort private int port;
-	@Inject @ServerDocRoot private String docRoot;
-	@Inject @ServerBufferSize private int bufferSize;
+	@Inject @HttpServerContext private HttpContext httpContext; 
 	@Inject private WorkerService workerService;
 
 	public void start() {
 		try {
 			AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(50));
-			final AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group).bind(new InetSocketAddress(port));
+			final AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group).bind(new InetSocketAddress(httpContext.getPort()));
 
-			System.out.println("Server listening on port " + port);
-			System.out.println("document root directory is " + docRoot);
-			System.out.println("buffersize is " + bufferSize);
+			System.out.println("Server listening on port " + httpContext.getPort());
+			System.out.println("document root directory is " + httpContext.getDocRoot());
 			
 			server.accept("Client connection",
 				new CompletionHandler<AsynchronousSocketChannel, Object>() {

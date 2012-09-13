@@ -6,16 +6,17 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import com.buergi.webserver.WebServer.HttpServerContext;
+import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.services.HttpRequestParserService;
 import com.buergi.webserver.services.WorkerService;
-import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerBufferSize;
 import com.google.inject.Inject;
 
 public class WorkerServiceImpl implements WorkerService {
-	@Inject @ServerBufferSize Integer bufferSize;
-	@Inject private HttpRequestParserService requestParserService; 
-	
+	@Inject @HttpServerContext private HttpContext httpContext; 
+	@Inject private HttpRequestParserService requestParserService;
+
 	public void handle(AsynchronousSocketChannel ch) {
 		try{
 			// if requestHeader is empty, close channel
@@ -44,7 +45,7 @@ public class WorkerServiceImpl implements WorkerService {
 	}
 
 	private String readChannel(AsynchronousSocketChannel ch) throws InterruptedException, ExecutionException{
-		ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
+		ByteBuffer readBuffer = ByteBuffer.allocate(httpContext.getBufferSize());
 		
 		StringBuffer sb = new StringBuffer();
 		
@@ -53,7 +54,7 @@ public class WorkerServiceImpl implements WorkerService {
 			readBuffer.flip();
 			sb.append(new String(readBuffer.array()));
 
-			if (x < bufferSize)
+			if (x < httpContext.getBufferSize())
 				break;
 		}
 		
@@ -62,6 +63,8 @@ public class WorkerServiceImpl implements WorkerService {
 
 	
 	private void writeMessage(HttpResponse httpResponse, AsynchronousSocketChannel ch) throws InterruptedException, ExecutionException, IOException {
+		int bufferSize = httpContext.getBufferSize();
+		
 		ByteBuffer readBuffer = ByteBuffer.allocate(bufferSize);
 		int pos = 0;
 

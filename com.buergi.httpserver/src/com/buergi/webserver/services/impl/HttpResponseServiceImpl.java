@@ -10,16 +10,17 @@ import java.util.Map;
 
 import org.apache.tika.Tika;
 
+import com.buergi.webserver.WebServer.HttpServerContext;
+import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
 import com.buergi.webserver.http.impl.HttpResponseErrorImpl;
 import com.buergi.webserver.http.impl.HttpResponseFileImpl;
 import com.buergi.webserver.services.HttpResponseService;
-import com.buergi.webserver.services.impl.WebServerServiceImpl.ServerDocRoot;
 import com.google.inject.Inject;
 
 public class HttpResponseServiceImpl implements HttpResponseService {
-	@Inject @ServerDocRoot String docRoot;
+	@Inject @HttpServerContext private HttpContext httpContext; 
 	
 	public HttpResponse createErrorResponse(String version, HttpStatusCode statusCode, Map<String, String> parameterMap) {
 		return HttpResponseErrorImpl.create(version, statusCode, parameterMap);
@@ -63,7 +64,7 @@ public class HttpResponseServiceImpl implements HttpResponseService {
 	}
 	
 	private FileObject createPath(String requestedPath) {
-		String absolutePath = docRoot.concat(requestedPath);
+		String absolutePath = httpContext.getDocRoot().concat(requestedPath);
 		
 		// does file exist??
 		File file = new File(absolutePath);

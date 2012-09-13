@@ -16,6 +16,7 @@ public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 	private static String DEFAULT_ENCODING = "UTF-8";
 
 	@Inject private Set<HttpRequest> httpRequestProtocols;
+//	@Inject private Inject injector;
 	
 	public HttpResponse createResponse(String requestHeader){
 		String lines[] = requestHeader.toString().split("\\r?\\n");
@@ -42,6 +43,7 @@ public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 			System.err.println("Unsupported Encoding error: " + e.getMessage());
 		}
 
+		
 		HttpRequest httpRequest = null;
 		for (HttpRequest hr : httpRequestProtocols){
 			if (hr.getVersion().equals(initialLines[2])){
