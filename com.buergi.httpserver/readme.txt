@@ -10,8 +10,9 @@ Requirement
 
 Usage
 -------
-The entry point for the applicatin is HttpServer.Java. Following arguments are available:
+The entry point is Bootstrap. The configuration file contains following properties:
 
-    o  document-root [port] [buffersize]
-
-Defaults: port = 8080, buffersize =	2048
+    o  document-root (default user.home)
+    o  port (default 8080)
+    o  buffer (default 2048)
+    o  threads (default 50)    

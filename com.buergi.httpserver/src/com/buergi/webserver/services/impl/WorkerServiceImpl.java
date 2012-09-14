@@ -13,6 +13,12 @@ import com.buergi.webserver.services.HttpRequestParserService;
 import com.buergi.webserver.services.WorkerService;
 import com.google.inject.Inject;
 
+/**
+ * @author martinbuergi
+ *
+ * Default implementation
+ * 
+ */
 public class WorkerServiceImpl implements WorkerService {
 	@Inject @HttpServerContext private HttpContext httpContext; 
 	@Inject private HttpRequestParserService requestParserService;

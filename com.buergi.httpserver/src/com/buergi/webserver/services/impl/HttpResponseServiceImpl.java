@@ -19,6 +19,12 @@ import com.buergi.webserver.http.impl.HttpResponseFileImpl;
 import com.buergi.webserver.services.HttpResponseService;
 import com.google.inject.Inject;
 
+/**
+ * @author martinbuergi
+ *
+ * Handles a http response
+ * 
+ */
 public class HttpResponseServiceImpl implements HttpResponseService {
 	@Inject @HttpServerContext private HttpContext httpContext; 
 	

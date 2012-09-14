@@ -6,6 +6,12 @@ import java.util.Map;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
 
+/**
+ * @author martinbuergi
+ *
+ * Generates error response
+ *
+ */
 public class HttpResponseErrorImpl extends HttpResponse {
 
 	private String errorMessage;

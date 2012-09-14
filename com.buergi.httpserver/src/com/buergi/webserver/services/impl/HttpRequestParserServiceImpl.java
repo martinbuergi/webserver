@@ -17,6 +17,12 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+/**
+ * @author martinbuergi
+ *
+ * Parses the request, get a http request instance and returns the response
+ *
+ */
 public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 	private static String DEFAULT_ENCODING = "UTF-8";
 
@@ -47,7 +53,6 @@ public class HttpRequestParserServiceImpl implements HttpRequestParserService {
 		} catch (UnsupportedEncodingException e) {
 			System.err.println("Unsupported Encoding error: " + e.getMessage());
 		}
-
 		
 		HttpRequest httpRequest;
 		try{

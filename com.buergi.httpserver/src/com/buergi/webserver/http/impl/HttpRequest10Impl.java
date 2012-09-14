@@ -10,11 +10,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.multibindings.Multibinder;
 
+/**
+ * @author martinbuergi
+ *
+ * Implements HTTP/1.0
+ *
+ */
 public class HttpRequest10Impl extends AbstractModule implements HttpRequest {
 
 	@Inject private HttpResponseService httpResponseService;
 
-	public String getVersion(){
+	protected String getVersion(){
 		return "HTTP/1.0";
 	}
 	

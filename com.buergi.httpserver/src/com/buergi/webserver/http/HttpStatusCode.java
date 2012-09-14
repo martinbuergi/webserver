@@ -1,5 +1,11 @@
 package com.buergi.webserver.http;
 
+/**
+ * @author martinbuergi
+ *
+ * http://www.w3.org/Protocols/HTTP/1.0/spec.html#Status-Codes
+ *
+ */
 public enum HttpStatusCode {
 	OK("200 OK"),
 	CREATED("201 Created"),

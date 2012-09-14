@@ -8,6 +8,12 @@ import java.util.concurrent.ExecutionException;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
 
+/**
+ * @author martinbuergi
+ *
+ * Generates a file response
+ *
+ */
 public class HttpResponseFileImpl extends HttpResponse {
 
 	private AsynchronousFileChannel fileChannel;

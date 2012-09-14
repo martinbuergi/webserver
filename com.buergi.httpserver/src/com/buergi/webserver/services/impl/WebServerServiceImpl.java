@@ -15,6 +15,13 @@ import com.buergi.webserver.services.WebServerService;
 import com.buergi.webserver.services.WorkerService;
 import com.google.inject.Inject;
 
+/**
+ * @author martinbuergi
+ *
+ * Implementation of a simple asynchronous webserver,
+ * no access authentication implemented at the moment
+ * 
+ */
 public class WebServerServiceImpl implements WebServerService {
 	
 	@Inject @HttpServerContext private HttpContext httpContext; 
@@ -22,7 +29,7 @@ public class WebServerServiceImpl implements WebServerService {
 
 	public void start() {
 		try {
-			AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(50));
+			AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(Executors.newFixedThreadPool(httpContext.getThreads()));
 			final AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group).bind(new InetSocketAddress(httpContext.getPort()));
 
 			System.out.println("Server listening on port " + httpContext.getPort());

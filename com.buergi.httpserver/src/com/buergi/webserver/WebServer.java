@@ -21,6 +21,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.name.Names;
 
+/**
+ * @author martinbuergi
+ *
+ * Injects all dependencies
+ *
+ */
 public class WebServer extends AbstractModule {
 
 	private HttpContext httpContext;
