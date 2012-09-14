@@ -27,7 +27,7 @@ import com.google.inject.Inject;
  */
 public class HttpResponseServiceImpl implements HttpResponseService {
 	@Inject @HttpServerContext private HttpContext httpContext; 
-	
+
 	public HttpResponse createErrorResponse(String version, HttpStatusCode statusCode, Map<String, String> parameterMap) {
 		return HttpResponseErrorImpl.create(version, statusCode, parameterMap);
 	}
