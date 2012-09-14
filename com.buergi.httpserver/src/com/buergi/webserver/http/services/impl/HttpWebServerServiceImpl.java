@@ -1,4 +1,4 @@
-package com.buergi.webserver.services.impl;
+package com.buergi.webserver.http.services.impl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.http.HttpWebServer.HttpServerContext;
-import com.buergi.webserver.services.WebServerService;
-import com.buergi.webserver.services.WorkerService;
+import com.buergi.webserver.http.services.HttpWebServerService;
+import com.buergi.webserver.http.services.HttpWorkerService;
 import com.google.inject.Inject;
 
 /**
@@ -22,10 +22,10 @@ import com.google.inject.Inject;
  * no access authentication implemented at the moment
  * 
  */
-public class WebServerServiceImpl implements WebServerService {
+public class HttpWebServerServiceImpl implements HttpWebServerService {
 	
 	@Inject @HttpServerContext private HttpContext httpContext; 
-	@Inject private WorkerService workerService;
+	@Inject private HttpWorkerService workerService;
 
 	public void start() {
 		try {

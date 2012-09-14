@@ -1,4 +1,4 @@
-package com.buergi.webserver.services;
+package com.buergi.webserver.http.services;
 
 
 /**
@@ -7,7 +7,7 @@ package com.buergi.webserver.services;
  * Interface for webserver
  * 
  */
-public interface WebServerService {
+public interface HttpWebServerService {
 
 	public void start();
 }

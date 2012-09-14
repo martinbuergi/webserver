@@ -1,4 +1,4 @@
-package com.buergi.webserver.services.impl;
+package com.buergi.webserver.http.services.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -9,8 +9,8 @@ import java.util.Map;
 import com.buergi.webserver.http.HttpRequest;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
-import com.buergi.webserver.services.HttpRequestParserService;
-import com.buergi.webserver.services.HttpResponseService;
+import com.buergi.webserver.http.services.HttpRequestParserService;
+import com.buergi.webserver.http.services.HttpResponseService;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.Injector;

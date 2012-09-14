@@ -1,4 +1,4 @@
-package com.buergi.webserver.services.impl;
+package com.buergi.webserver.http.services.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import com.buergi.webserver.http.HttpStatusCode;
 import com.buergi.webserver.http.HttpWebServer.HttpServerContext;
 import com.buergi.webserver.http.impl.HttpResponseErrorImpl;
 import com.buergi.webserver.http.impl.HttpResponseFileImpl;
-import com.buergi.webserver.services.HttpResponseService;
+import com.buergi.webserver.http.services.HttpResponseService;
 import com.google.inject.Inject;
 
 /**

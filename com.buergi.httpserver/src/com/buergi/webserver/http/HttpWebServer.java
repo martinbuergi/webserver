@@ -7,14 +7,14 @@ import java.lang.annotation.Target;
 
 import com.buergi.webserver.http.impl.HttpRequest10Impl;
 import com.buergi.webserver.http.impl.HttpRequest11Impl;
-import com.buergi.webserver.services.HttpRequestParserService;
-import com.buergi.webserver.services.HttpResponseService;
-import com.buergi.webserver.services.WebServerService;
-import com.buergi.webserver.services.WorkerService;
-import com.buergi.webserver.services.impl.HttpRequestParserServiceImpl;
-import com.buergi.webserver.services.impl.HttpResponseServiceImpl;
-import com.buergi.webserver.services.impl.WebServerServiceImpl;
-import com.buergi.webserver.services.impl.WorkerServiceImpl;
+import com.buergi.webserver.http.services.HttpRequestParserService;
+import com.buergi.webserver.http.services.HttpResponseService;
+import com.buergi.webserver.http.services.HttpWebServerService;
+import com.buergi.webserver.http.services.HttpWorkerService;
+import com.buergi.webserver.http.services.impl.HttpRequestParserServiceImpl;
+import com.buergi.webserver.http.services.impl.HttpResponseServiceImpl;
+import com.buergi.webserver.http.services.impl.HttpWebServerServiceImpl;
+import com.buergi.webserver.http.services.impl.HttpWorkerServiceImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.name.Names;
@@ -44,8 +44,8 @@ public class HttpWebServer extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(WebServerService.class).to(WebServerServiceImpl.class);
-		bind(WorkerService.class).to(WorkerServiceImpl.class);
+		bind(HttpWebServerService.class).to(HttpWebServerServiceImpl.class);
+		bind(HttpWorkerService.class).to(HttpWorkerServiceImpl.class);
 		bind(HttpRequestParserService.class).to(HttpRequestParserServiceImpl.class);
 		bind(HttpResponseService.class).to(HttpResponseServiceImpl.class);				
 		bind(HttpRequest.class).annotatedWith(Names.named("HTTP/1.0")).to(HttpRequest10Impl.class);

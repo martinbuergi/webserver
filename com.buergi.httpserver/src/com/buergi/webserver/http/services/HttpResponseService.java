@@ -1,4 +1,4 @@
-package com.buergi.webserver.services;
+package com.buergi.webserver.http.services;
 
 import java.util.Map;
 

@@ -5,7 +5,7 @@ import java.util.Map;
 import com.buergi.webserver.http.HttpRequest;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
-import com.buergi.webserver.services.HttpResponseService;
+import com.buergi.webserver.http.services.HttpResponseService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.multibindings.Multibinder;

@@ -1,4 +1,4 @@
-package com.buergi.webserver.services.impl;
+package com.buergi.webserver.http.services.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,8 +9,8 @@ import java.util.concurrent.Future;
 import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpWebServer.HttpServerContext;
-import com.buergi.webserver.services.HttpRequestParserService;
-import com.buergi.webserver.services.WorkerService;
+import com.buergi.webserver.http.services.HttpRequestParserService;
+import com.buergi.webserver.http.services.HttpWorkerService;
 import com.google.inject.Inject;
 
 /**
@@ -19,7 +19,7 @@ import com.google.inject.Inject;
  * Default implementation
  * 
  */
-public class WorkerServiceImpl implements WorkerService {
+public class HttpWorkerServiceImpl implements HttpWorkerService {
 	@Inject @HttpServerContext private HttpContext httpContext; 
 	@Inject private HttpRequestParserService requestParserService;
 

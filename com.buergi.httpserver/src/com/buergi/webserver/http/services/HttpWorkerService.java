@@ -1,4 +1,4 @@
-package com.buergi.webserver.services;
+package com.buergi.webserver.http.services;
 
 import java.nio.channels.AsynchronousSocketChannel;
 
@@ -8,7 +8,7 @@ import java.nio.channels.AsynchronousSocketChannel;
  * Provides service to handle one connection
  * 
  */
-public interface WorkerService {
+public interface HttpWorkerService {
 	
 	public void handle(AsynchronousSocketChannel ch);
 }
