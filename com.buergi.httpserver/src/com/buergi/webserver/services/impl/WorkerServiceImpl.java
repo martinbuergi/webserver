@@ -6,9 +6,9 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.buergi.webserver.WebServer.HttpServerContext;
 import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.http.HttpResponse;
+import com.buergi.webserver.http.HttpWebServer.HttpServerContext;
 import com.buergi.webserver.services.HttpRequestParserService;
 import com.buergi.webserver.services.WorkerService;
 import com.google.inject.Inject;

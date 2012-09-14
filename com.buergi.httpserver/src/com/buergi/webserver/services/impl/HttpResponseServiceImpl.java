@@ -10,10 +10,10 @@ import java.util.Map;
 
 import org.apache.tika.Tika;
 
-import com.buergi.webserver.WebServer.HttpServerContext;
 import com.buergi.webserver.http.HttpContext;
 import com.buergi.webserver.http.HttpResponse;
 import com.buergi.webserver.http.HttpStatusCode;
+import com.buergi.webserver.http.HttpWebServer.HttpServerContext;
 import com.buergi.webserver.http.impl.HttpResponseErrorImpl;
 import com.buergi.webserver.http.impl.HttpResponseFileImpl;
 import com.buergi.webserver.services.HttpResponseService;

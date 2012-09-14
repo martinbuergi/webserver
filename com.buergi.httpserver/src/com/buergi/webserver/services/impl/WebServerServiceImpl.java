@@ -9,8 +9,8 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.buergi.webserver.WebServer.HttpServerContext;
 import com.buergi.webserver.http.HttpContext;
+import com.buergi.webserver.http.HttpWebServer.HttpServerContext;
 import com.buergi.webserver.services.WebServerService;
 import com.buergi.webserver.services.WorkerService;
 import com.google.inject.Inject;

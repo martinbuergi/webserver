@@ -1,12 +1,10 @@
-package com.buergi.webserver;
+package com.buergi.webserver.http;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.buergi.webserver.http.HttpContext;
-import com.buergi.webserver.http.HttpRequest;
 import com.buergi.webserver.http.impl.HttpRequest10Impl;
 import com.buergi.webserver.http.impl.HttpRequest11Impl;
 import com.buergi.webserver.services.HttpRequestParserService;
@@ -27,11 +25,11 @@ import com.google.inject.name.Names;
  * Injects all dependencies
  *
  */
-public class WebServer extends AbstractModule {
+public class HttpWebServer extends AbstractModule {
 
 	private HttpContext httpContext;
 	
-	public WebServer(HttpContext httpContext) {
+	public HttpWebServer(HttpContext httpContext) {
 		this.httpContext = httpContext;
 	}
 
